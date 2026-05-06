@@ -1,0 +1,54 @@
+---
+title: "Fetching Annotations"
+description: |
+  This lesson introduces participants to retrieving gene-level annotations using the AnnotationHub packages. Participants will learn how to connect to AnnotationHub, query Ensembl databases, download the appropriate annotation resources and extract essential gene information for downstream analysis.
+author:
+  - Meeta Mistry
+  - Will Gammerdinger
+  - Noor Sohail
+date: "2025-05-30"
+categories: 
+  - R Programming
+keywords:
+  - R
+  - AnnotationHub
+  - Ensembl
+  - Gene annotations
+license: "CC-BY-4.0"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r}
+library(AnnotationHub)
+library(tidyverse)
+```
+
+```{r}
+# Connect to AnnotationHub
+ah <- AnnotationHub()
+
+# Access the Ensembl database for organism
+ahDb <- query(ah, 
+              pattern = c("Homo sapiens", "EnsDb"), 
+              ignore.case = TRUE)
+
+# Acquire the latest annotation files
+id <- ahDb %>%
+        mcols() %>%
+        rownames() %>%
+        tail(n = 1)
+
+# Download the appropriate Ensembldb database
+edb <- ah[[id]]
+
+# Extract gene-level information from database
+annotations <- genes(edb, 
+                     return.type = "data.frame")
+
+# Select annotations of interest
+annotations <- annotations %>%
+        dplyr::select(gene_id, gene_name, seq_name, gene_biotype, description)
+head(annotations)
+```
